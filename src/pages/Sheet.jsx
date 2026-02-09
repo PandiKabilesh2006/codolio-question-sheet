@@ -2,8 +2,12 @@ import {useState} from "react";
 import useSheetStore from "../store/useSheetStore";
 function Sheet(){
     const [topicTitle,setTopicTitle]=useState("");
-    const addTopic=useSheetStore((state)=>state.addTopic);
+    const [subtopicInputs,setSubtopicInputs]=useState("");
+
     const topics=useSheetStore((state)=>state.topics);
+    const addTopic=useSheetStore((state)=>state.addTopic);
+    const addSubtopic=useSheetStore((state)=>state.addSubtopic);
+
     return (
         <div className="max-w-5xl mx-auto p-6">
             {/* Header section */}
@@ -33,7 +37,7 @@ function Sheet(){
         </div>
 
             {/* Topics List */}
-            <div className="space-y-3">
+            <div className="space-y-4">
                 {topics.length===0?(
                     <p className="text-gray-500">
                         No topics yet. Add your first topic.
@@ -44,7 +48,52 @@ function Sheet(){
                         key={topic.id}
                         className="border bg-white p-4 rounded"
                         >
-                            {topic.title}
+                            {/* Topic title */}
+                            <h3 className="font-semibold text-lg">
+                                {topic.title}
+                            </h3>
+
+                            {/* ------------- Add Subtopic ------------*/}
+                            <div className="flex gap-2 mt-3">
+                                <input type="text" 
+                                value={subtopicInputs[topic.id] || ""}
+                                onChange={(e)=>
+                                    setSubtopicInputs({
+                                        ...subtopicInputs,
+                                        [topic.id]: e.target.value,
+
+                                    })
+                                }
+                                placeholder="New subtopic"
+                                className="border px-3 py-2 rounded text-sm"
+                                />
+
+                                <button 
+                                onClick={()=>{
+                                    const title=subtopicInputs[topic.id];
+                                    if(!title?.trim()) return;
+
+                                    addSubtopic(topic.id,title);
+
+                                    setSubtopicInputs({
+                                        ...subtopicInputs,
+                                        [topic.id]:"",
+                                    });
+                                }}
+                                className="bg-gray-800 text-white px-3 py-2 rounded text-sm"
+                                >
+                                    + Add Subtopic
+                                </button>
+                            </div>
+
+                            {/* Subtopics List */}
+                            <div className="mt-3 space-y-2">
+                                {topic.subtopics.map((sub)=>(
+                                    <div key={sub.id} className="ml-4 border-l pl-3 text-sm">
+                                        {sub.title}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     ))
                 )}
